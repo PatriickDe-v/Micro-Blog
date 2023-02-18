@@ -14,7 +14,6 @@
         Microblog
         <a href="/index">Home</a>
         <a href="/login">Login</a>
-        {% block content %}{% endblock %}
     </div>
     <hr>
     {% with messages = get_flashed_messages() %}
@@ -25,7 +24,7 @@
         {% endfor %}
     </ul>
     {% endif %}
-    {% endwitch %}
+    {% endwith %}
     {% block content %}{% endblock %}
 </body>
 
