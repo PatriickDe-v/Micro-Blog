@@ -3,6 +3,7 @@ from flask import render_template
 from app import app
 
 
+#Definindo as rotas. 
 @app.route('/')
 @app.route('/index')
 def index():
