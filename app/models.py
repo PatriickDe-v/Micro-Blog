@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from app import db
 
 
@@ -13,6 +15,12 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+    def set_password(self, password):     #cria string codificada
+        self.password_hash = generate_password_hash(password) 
+
+    def check_password(self, password): #checa se a string códificada é a mesma da senha.
+        return check_password_hash(self.password_hash, password)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
