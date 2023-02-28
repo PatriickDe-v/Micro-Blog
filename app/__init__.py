@@ -11,6 +11,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login' #uam função ou (endpoit) para exibição de login
-from app import models, routes
+from app import errors, models, routes
 
 #set FLASK_APP=microblog.py
