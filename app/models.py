@@ -6,8 +6,16 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login
 
+# Tabela de assosiação de seguidores
+followers = db.Table('followers',
+                     db.Column('follower_id', db.Integer,
+                               db.ForeignKey('user.id')),
+                     db.Column('followed_id', db.Integer,
+                               db.ForeignKey('user.id'))
+                     )
+# models do banco de dados
 
-#models do banco de dados
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -16,19 +24,27 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    follwed = db.relationship(
+        'User', secundary=followers,
+        primaryjoin=(followers.c.follower_id == id),
+        secundaryjoin=(followers.c.followed_id == id),
+        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
-    def set_password(self, password):     #cria string codificada
-        self.password_hash = generate_password_hash(password) 
+    def set_password(self, password):  # cria string codificada
+        self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password): #checa se a string códificada é a mesma da senha.
+    # checa se a string códificada é a mesma da senha.
+    def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
-    def avatar(self, size): 
-        digest = md5(self.email.lower().encode('utf-8')).hexdigest()  #Retorna a imagem de perfil do usuário
+
+    def avatar(self, size):
+        # Retorna a imagem de perfil do usuário
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
+
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,11 +54,8 @@ class Post(db.Model):
 
     def __repr__(self):
         return f'<Post {self.body}'
-#Tabela de assosiação de seguidores
-followers = db.Table('followers',
-                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
-                     )
-@login.user_loader #carregador de usuário ('lembrar do usuário')
-def load_user(id): 
+
+
+@login.user_loader  # carregador de usuário ('lembrar do usuário')
+def load_user(id):
     return User.query.get(int(id))
