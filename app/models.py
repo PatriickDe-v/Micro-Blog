@@ -38,8 +38,11 @@ class Post(db.Model):
 
     def __repr__(self):
         return f'<Post {self.body}'
-
-
+#Tabela de assosiação de seguidores
+followers = db.Table('followers',
+                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
+                     )
 @login.user_loader #carregador de usuário ('lembrar do usuário')
 def load_user(id): 
     return User.query.get(int(id))
